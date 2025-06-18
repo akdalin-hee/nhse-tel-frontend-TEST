@@ -65,4 +65,4 @@ jobs:
         run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.TEST_TOKIN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
       - name: Publish NuGet package to GitHub Packages
-        run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.TEST_TOKIN }} --source "github" --skip-duplicate
+        run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.TEST_TOKIN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
