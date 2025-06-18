@@ -42,7 +42,7 @@ jobs:
     #if: github.event.pull_request.merged == true
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'DotnetViewComponents.sln'
+      PROJECT_PATH: 'DotnetViewComponents/DotnetViewComponents.csproj'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,13 +53,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore NuGet packages
-        run: dotnet restore ${{ env.SOLUTION }}
+        run: dotnet restore ${{ env.PROJECT_PATH  }}
 
       - name: Build solution
-        run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} --no-restore
+        run: dotnet build ${{ env.PROJECT_PATH  }} --configuration ${{ env.BUILD_CONFIG }} --no-restore
 
       - name: Pack NuGet package
-        run: dotnet pack ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} --no-build -o out
+        run: dotnet pack ${{ env.PROJECT_PATH  }} --configuration ${{ env.BUILD_CONFIG }} --no-build -o out
 
       - name: Add GitHub NuGet source
         run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.TEST_TOKIN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
