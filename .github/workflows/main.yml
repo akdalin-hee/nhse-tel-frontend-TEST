@@ -51,6 +51,22 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+          
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.5.0'
+          
+      - name: Determine Version
+        id:   gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "Major: ${{ steps.gitversion.outputs.major }}"
+          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
       - name: Restore NuGet packages
         run: dotnet restore ${{ env.PROJECT_PATH  }}
@@ -60,9 +76,6 @@ jobs:
 
       - name: Pack NuGet package
         run: dotnet pack ${{ env.PROJECT_PATH  }} --configuration ${{ env.BUILD_CONFIG }} --no-build -o out
-
-      - name: Add GitHub NuGet source
-        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.RELEASE_TOKEN  }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
       - name: Publish NuGet package to GitHub Packages
         run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.RELEASE_TOKEN  }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
